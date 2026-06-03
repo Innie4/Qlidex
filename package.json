@@ -1,0 +1,25 @@
+{
+  "name": "qlidex",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @qlidex/web",
+    "dev:web": "npm run dev -w @qlidex/web",
+    "dev:api": "npm run dev -w @qlidex/api",
+    "migrate": "npm run migrate -w @qlidex/api",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:watch": "npm run test:watch -w @qlidex/web",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "overrides": {
+    "postcss": "^8.5.10",
+    "next@16.2.7": {
+      "postcss": "^8.5.10"
+    }
+  }
+}
