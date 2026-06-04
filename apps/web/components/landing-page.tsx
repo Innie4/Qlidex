@@ -130,7 +130,7 @@ export function LandingPage() {
           <section id="faq" className="section-anchor" style={artboardStyle(0, 7020, 10, 10)} aria-hidden="true" />
           <section id="contact" className="section-anchor" style={artboardStyle(0, 8030, 10, 10)} aria-hidden="true" />
 
-          <div className="art-mask trust-mask" style={artboardStyle(0, 988, 1512, 280)} aria-hidden="true" />
+          <div className="art-mask trust-mask" style={artboardStyle(0, 988, 1512, 340)} aria-hidden="true" />
           <section className="trust-overlay" aria-label="Trusted support categories" style={artboardStyle(0, 1006, 1512, 250)}>
             <p>Trusted Support for Fast-Growing Businesses In:</p>
             <div className="trust-card-row">
