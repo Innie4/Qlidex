@@ -6,6 +6,10 @@ export type ContactSubmission = {
   id: string;
   name: string;
   email: string;
+  businessEmail: string;
+  country: string;
+  countryCode: string;
+  phoneNumber: string;
   createdAt: string;
 };
 
@@ -73,17 +77,33 @@ export function createDatabase(databasePath: string): DatabaseHandle {
       database
         .prepare(
           `
-          INSERT INTO contact_submissions (id, name, email, created_at)
-          VALUES (?, ?, ?, ?)
+          INSERT INTO contact_submissions (id, name, email, country, country_code, phone_number, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         `
         )
-        .run(submission.id, submission.name, submission.email, submission.createdAt);
+        .run(
+          submission.id,
+          submission.name,
+          submission.email,
+          submission.country,
+          submission.countryCode,
+          submission.phoneNumber,
+          submission.createdAt
+        );
     },
     listContactSubmissions() {
       return database
         .prepare(
           `
-          SELECT id, name, email, created_at AS createdAt
+          SELECT
+            id,
+            name,
+            email,
+            email AS businessEmail,
+            country,
+            country_code AS countryCode,
+            phone_number AS phoneNumber,
+            created_at AS createdAt
           FROM contact_submissions
           ORDER BY created_at DESC
         `

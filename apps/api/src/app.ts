@@ -35,13 +35,16 @@ export function createApp(options: { databasePath?: string } = {}) {
   });
 
   app.post("/api/contact", (request: Request, response: Response) => {
-    const name = normalizeValue(request.body?.name);
-    const email = normalizeValue(request.body?.email).toLowerCase();
+    const name = normalizeValue(request.body?.name) || "Callback request";
+    const email = normalizeValue(request.body?.businessEmail ?? request.body?.email).toLowerCase();
+    const country = normalizeValue(request.body?.country);
+    const countryCode = normalizeValue(request.body?.countryCode);
+    const phoneNumber = normalizeValue(request.body?.phoneNumber);
 
-    if (!name || !email || !isEmail(email)) {
+    if (!email || !isEmail(email) || !country || !countryCode || !phoneNumber) {
       response.status(400).json({
         ok: false,
-        message: "A valid name and email are required."
+        message: "A valid business email, country, country code, and phone number are required."
       });
       return;
     }
@@ -50,6 +53,10 @@ export function createApp(options: { databasePath?: string } = {}) {
       id: randomUUID(),
       name,
       email,
+      businessEmail: email,
+      country,
+      countryCode,
+      phoneNumber,
       createdAt: new Date().toISOString()
     };
 

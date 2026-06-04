@@ -2,6 +2,7 @@
 
 import type { CSSProperties, FormEvent } from "react";
 import { useState } from "react";
+import countries, { type Country } from "world-countries";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
@@ -34,10 +35,34 @@ const faqs = [
 ];
 
 const trustCards = [
-  { title: "Forex & Prop", subtitle: "Trading", icon: "FT" },
-  { title: "Crypto &", subtitle: "Web3", icon: "CW" },
-  { title: "E-commerce", subtitle: "Brands", icon: "EB" }
+  { title: "Forex & Prop", subtitle: "Trading", icon: "trading" },
+  { title: "Crypto &", subtitle: "Web3", icon: "crypto" },
+  { title: "E-commerce", subtitle: "Brands", icon: "commerce" }
 ];
+
+type CountryOption = {
+  code: string;
+  name: string;
+  dialCode: string;
+};
+
+function getDialCode(country: Country) {
+  const root = country.idd?.root ?? "";
+  const suffixes = country.idd?.suffixes ?? [];
+  const suffix = suffixes.length === 1 ? suffixes[0] : "";
+  return root ? `${root}${suffix}` : "";
+}
+
+const countryOptions: CountryOption[] = countries
+  .map((country) => ({
+    code: country.cca2,
+    name: country.name.common,
+    dialCode: getDialCode(country)
+  }))
+  .filter((country) => country.dialCode)
+  .sort((left, right) => left.name.localeCompare(right.name));
+
+const defaultCountryCode = countryOptions.find((country) => country.code === "US")?.code ?? countryOptions[0]?.code ?? "";
 
 function artboardStyle(x: number, y: number, w: number, h: number): CSSProperties {
   return {
@@ -51,6 +76,20 @@ function artboardStyle(x: number, y: number, w: number, h: number): CSSPropertie
 export function LandingPage() {
   const [openFaq, setOpenFaq] = useState(0);
   const [formStatus, setFormStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [selectedCountryCode, setSelectedCountryCode] = useState(defaultCountryCode);
+  const [isCountryPickerOpen, setIsCountryPickerOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+  const selectedCountry =
+    countryOptions.find((country) => country.code === selectedCountryCode) ?? countryOptions[0];
+  const normalizedCountrySearch = countrySearch.trim().toLowerCase();
+  const filteredCountryOptions = normalizedCountrySearch
+    ? countryOptions.filter((country) => {
+        const searchableText = `${country.name} ${country.code} ${country.dialCode}`.toLowerCase();
+        return searchableText.includes(normalizedCountrySearch);
+      })
+    : countryOptions;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,8 +106,10 @@ export function LandingPage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          name: formData.get("name"),
-          email: formData.get("email")
+          businessEmail: formData.get("businessEmail"),
+          country: selectedCountry?.name,
+          countryCode: selectedCountry?.dialCode,
+          phoneNumber: formData.get("phoneNumber")
         })
       });
 
@@ -77,6 +118,7 @@ export function LandingPage() {
       }
 
       form.reset();
+      setPhoneNumber("");
       setFormStatus("sent");
     } catch {
       setFormStatus("error");
@@ -136,7 +178,7 @@ export function LandingPage() {
             <div className="trust-card-row">
               {trustCards.map((card) => (
                 <article className="trust-card" key={card.title}>
-                  <span>{card.icon}</span>
+                  <TrustIcon name={card.icon} />
                   <strong>{card.title}</strong>
                   <small>{card.subtitle}</small>
                 </article>
@@ -192,13 +234,89 @@ export function LandingPage() {
 
           <form
             className={formStatus === "sent" ? "prototype-form contact-hit-form is-submitted" : "prototype-form contact-hit-form"}
-            style={artboardStyle(795, 8158, 620, 250)}
+            style={artboardStyle(800, 8461, 616, 312)}
             aria-label="Request a callback"
             onSubmit={handleSubmit}
           >
-            <input aria-label="Your name" name="name" placeholder="Your name" />
-            <input aria-label="Your email" name="email" type="email" placeholder="Your email address" />
+            <input
+              aria-label="Business email"
+              name="businessEmail"
+              type="text"
+              inputMode="email"
+              placeholder="Business email..."
+              required
+            />
+            <div className="phone-row">
+              <div className="country-picker">
+                <input type="hidden" name="country" value={selectedCountryCode} />
+                <button
+                  type="button"
+                  className="country-trigger"
+                  aria-expanded={isCountryPickerOpen}
+                  aria-label="Country calling code"
+                  onClick={() => setIsCountryPickerOpen((isOpen) => !isOpen)}
+                >
+                  <span>{selectedCountry ? `${selectedCountry.code} ${selectedCountry.dialCode}` : "Select"}</span>
+                </button>
+                {isCountryPickerOpen ? (
+                  <div className="country-menu" role="dialog" aria-label="Select country calling code">
+                    <div className="country-search-row">
+                      <input
+                        aria-label="Search countries"
+                        type="search"
+                        value={countrySearch}
+                        placeholder="Search country"
+                        onChange={(event) => setCountrySearch(event.target.value)}
+                      />
+                      <button type="button" onClick={() => setCountrySearch(countrySearch.trim())}>
+                        Search
+                      </button>
+                    </div>
+                    <div className="country-option-list" role="listbox">
+                      {filteredCountryOptions.map((country) => (
+                        <button
+                          type="button"
+                          role="option"
+                          aria-selected={country.code === selectedCountryCode}
+                          aria-label={`${country.name} ${country.code} ${country.dialCode}`}
+                          className="country-option"
+                          key={country.code}
+                          onClick={() => {
+                            setSelectedCountryCode(country.code);
+                            setCountrySearch("");
+                            setIsCountryPickerOpen(false);
+                          }}
+                        >
+                          <span>{country.name}</span>
+                          <strong>
+                            {country.code} {country.dialCode}
+                          </strong>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              <input
+                aria-label="Phone number"
+                name="phoneNumber"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                placeholder="Phone Number"
+                value={phoneNumber}
+                onChange={(event) => setPhoneNumber(event.target.value.replace(/\D/g, ""))}
+                required
+              />
+            </div>
             <button type="submit" disabled={formStatus === "sending"}>
+              <span aria-hidden="true" className="call-icon">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M6.6 10.8a11.7 11.7 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1v3.5c0 .6-.4 1-1 1A17.3 17.3 0 0 1 3 3.7c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1l-2.2 2.2Z" />
+                  <path d="M15.8 8.2h4.1v4.1" />
+                  <path d="m15.4 12.6 4.4-4.4" />
+                </svg>
+              </span>
               {formStatus === "sending" ? "Sending..." : formStatus === "sent" ? "Request Sent" : "Book a Call"}
             </button>
             <p className="form-status" aria-live="polite">
@@ -208,5 +326,45 @@ export function LandingPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+function TrustIcon({ name }: { name: string }) {
+  if (name === "trading") {
+    return (
+      <span className="trust-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" focusable="false">
+          <path d="M7 32h8v7H7zM18 25h8v14h-8zM29 18h8v21h-8z" />
+          <path d="M7 14h27" />
+          <path d="m31 8 8 6-8 6" />
+        </svg>
+      </span>
+    );
+  }
+
+  if (name === "crypto") {
+    return (
+      <span className="trust-icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" focusable="false">
+          <path d="M17 8h14l6 6v8l-6 6H17z" />
+          <path d="M17 28v12h18" />
+          <path d="M23 14v14M29 14v14" />
+          <circle cx="35" cy="13" r="8" />
+          <path d="M35 9v8M31 13h8" />
+        </svg>
+      </span>
+    );
+  }
+
+  return (
+    <span className="trust-icon" aria-hidden="true">
+      <svg viewBox="0 0 48 48" focusable="false">
+        <path d="M14 16h20v22H14z" />
+        <path d="M18 16a6 6 0 0 1 12 0" />
+        <path d="M24 22v10" />
+        <path d="M20 26h8" />
+        <path d="M9 9v9M9 30v9M39 9v9M39 30v9M5 14h8M5 34h8M35 14h8M35 34h8" />
+      </svg>
+    </span>
   );
 }

@@ -41,24 +41,32 @@ describe("Qlidex API", () => {
   it("accepts valid contact submissions", async () => {
     const app = createTestApp();
     const response = await request(app).post("/api/contact").send({
-      name: "Ada",
-      email: "ADA@example.com"
+      businessEmail: "ADA@example.com",
+      country: "United States",
+      countryCode: "+1",
+      phoneNumber: "5551234567"
     });
     closeAppDatabase(app);
 
     expect(response.status).toBe(201);
     expect(response.body.ok).toBe(true);
     expect(response.body.submission).toMatchObject({
-      name: "Ada",
-      email: "ada@example.com"
+      name: "Callback request",
+      email: "ada@example.com",
+      businessEmail: "ada@example.com",
+      country: "United States",
+      countryCode: "+1",
+      phoneNumber: "5551234567"
     });
   });
 
   it("rejects invalid contact submissions", async () => {
     const app = createTestApp();
     const response = await request(app).post("/api/contact").send({
-      name: "Ada",
-      email: "not-an-email"
+      businessEmail: "not-an-email",
+      country: "United States",
+      countryCode: "+1",
+      phoneNumber: "5551234567"
     });
     closeAppDatabase(app);
 
@@ -69,8 +77,10 @@ describe("Qlidex API", () => {
   it("protects stored submissions with the API key", async () => {
     const app = createTestApp();
     await request(app).post("/api/contact").send({
-      name: "Ada",
-      email: "ada@example.com"
+      businessEmail: "ada@example.com",
+      country: "United States",
+      countryCode: "+1",
+      phoneNumber: "5551234567"
     });
 
     const unauthorized = await request(app).get("/api/contact");
@@ -81,5 +91,11 @@ describe("Qlidex API", () => {
 
     expect(authorized.status).toBe(200);
     expect(authorized.body.submissions).toHaveLength(1);
+    expect(authorized.body.submissions[0]).toMatchObject({
+      businessEmail: "ada@example.com",
+      country: "United States",
+      countryCode: "+1",
+      phoneNumber: "5551234567"
+    });
   });
 });

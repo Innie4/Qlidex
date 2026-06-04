@@ -160,17 +160,18 @@ input {
   position: absolute;
   pointer-events: none;
   display: grid;
-  justify-items: center;
-  align-content: start;
-  gap: clamp(10px, 1.8vw, 28px);
+  grid-template-columns: clamp(132px, 31.5vw, 305px) auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(18px, 7vw, 140px);
+  padding: 0 clamp(20px, 9vw, 150px);
   color: var(--text);
 }
 
 .trust-overlay p {
-  width: min(90%, 680px);
   margin: 0;
   text-align: left;
-  font-size: clamp(10px, 1.15vw, 18px);
+  font-size: clamp(8px, 1.6vw, 17px);
   font-weight: 700;
   line-height: 1.2;
 }
@@ -178,36 +179,44 @@ input {
 .trust-card-row {
   display: flex;
   justify-content: center;
-  gap: clamp(20px, 5vw, 92px);
-  width: 100%;
+  gap: clamp(12px, 3.9vw, 70px);
+  width: auto;
 }
 
 .trust-card {
   display: grid;
   place-items: center;
-  width: clamp(54px, 11vw, 166px);
-  aspect-ratio: 1.12;
-  padding: clamp(7px, 1.4vw, 18px);
-  border-radius: clamp(5px, 1vw, 14px);
+  width: clamp(46px, 10.7vw, 112px);
+  aspect-ratio: 1.08;
+  padding: clamp(5px, 1.1vw, 14px);
+  border-radius: clamp(7px, 0.7vw, 10px);
   background: white;
-  box-shadow: 0 16px 32px rgba(5, 7, 168, 0.13);
+  box-shadow: 0 11px 20px rgba(12, 16, 88, 0.15);
 }
 
-.trust-card span {
+.trust-icon {
   display: grid;
   place-items: center;
-  width: clamp(18px, 3.1vw, 44px);
-  height: clamp(18px, 3.1vw, 44px);
+  width: clamp(16px, 2.35vw, 36px);
+  height: clamp(16px, 2.35vw, 36px);
   color: #7774ff;
-  font-size: clamp(8px, 1.2vw, 16px);
-  font-weight: 900;
+}
+
+.trust-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .trust-card strong,
 .trust-card small {
   display: block;
   color: var(--text);
-  font-size: clamp(6px, 0.85vw, 13px);
+  font-size: clamp(5px, 0.95vw, 10px);
   line-height: 1.2;
   text-align: center;
 }
@@ -357,44 +366,174 @@ input {
 .prototype-form {
   pointer-events: auto;
   display: grid;
-  gap: clamp(8px, 1vw, 14px);
+  grid-template-rows: 1fr 1fr 1fr auto;
+  gap: clamp(14px, 1.8vw, 31px);
 }
 
 .prototype-form input,
-.prototype-form button {
+.country-trigger,
+.prototype-form > button {
   width: 100%;
-  min-height: clamp(28px, 3.2vw, 52px);
   border: 0;
-  border-radius: clamp(6px, 0.8vw, 12px);
+  border-radius: clamp(11px, 1.32vw, 20px);
 }
 
-.contact-hit-form input,
-.contact-hit-form button,
-.contact-hit-form .form-status {
-  opacity: 0;
-}
-
-.prototype-form input {
-  padding: 0 clamp(12px, 1.6vw, 24px);
+.prototype-form input,
+.country-trigger {
+  min-height: clamp(45px, 4.76vw, 72px);
+  padding: 0 clamp(18px, 2vw, 30px);
   background: white;
-  color: var(--text);
-  font-size: clamp(7px, 0.88vw, 14px);
+  color: #767676;
+  font-size: clamp(14px, 1.32vw, 20px);
   outline: 2px solid transparent;
 }
 
-.prototype-form input:focus {
+.prototype-form input:focus,
+.country-trigger:focus {
   outline-color: transparent;
 }
 
-.prototype-form button {
+.phone-row {
+  display: grid;
+  grid-template-columns: clamp(100px, 8vw, 122px) 1fr;
+  overflow: visible;
+  border-radius: clamp(11px, 1.32vw, 20px);
+  background: white;
+}
+
+.country-trigger,
+.phone-row input {
+  border-radius: 0;
+}
+
+.country-picker {
+  position: relative;
+  min-width: 0;
+}
+
+.country-trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border-right: 1px solid #dddddd;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, #777 50%), linear-gradient(135deg, #777 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: clamp(24px, 2.1vw, 32px);
+  text-align: left;
+}
+
+.country-trigger span {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.country-menu {
+  position: absolute;
+  z-index: 25;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(360px, 64vw);
+  overflow: hidden;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 18px 42px rgba(12, 16, 88, 0.22);
+}
+
+.country-search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 10px;
+  border-bottom: 1px solid #ececf7;
+}
+
+.country-search-row input {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: #f6f6ff;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.country-search-row button {
+  width: auto;
+  min-height: 36px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 14px;
+  background: var(--blue);
   color: white;
-  background: var(--orange);
-  font-size: clamp(8px, 0.95vw, 15px);
+  font-size: 12px;
   font-weight: 800;
   cursor: pointer;
 }
 
-.prototype-form button:disabled {
+.country-option-list {
+  display: grid;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.country-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  border: 0;
+  padding: 10px 12px;
+  background: white;
+  color: var(--text);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.country-option:hover,
+.country-option[aria-selected="true"] {
+  background: #eeeeff;
+}
+
+.country-option span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prototype-form > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.4vw, 20px);
+  min-height: clamp(48px, 4.76vw, 72px);
+  color: white;
+  background: #ff6200;
+  font-size: clamp(18px, 2.05vw, 31px);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.call-icon {
+  width: clamp(24px, 2.2vw, 34px);
+  height: clamp(24px, 2.2vw, 34px);
+}
+
+.call-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.prototype-form > button:disabled {
   cursor: default;
 }
 

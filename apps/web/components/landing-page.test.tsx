@@ -39,15 +39,25 @@ describe("LandingPage", () => {
     expect(supportQuestion).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByText(/onboarding, retention workflows/i)).toBeInTheDocument();
 
-    await user.type(screen.getByLabelText("Your name"), "Ada");
-    await user.type(screen.getByLabelText("Your email"), "ada@example.com");
+    await user.type(screen.getByLabelText("Business email"), "ada@example.com");
+    await user.click(screen.getByLabelText("Country calling code"));
+    await user.type(screen.getByLabelText("Search countries"), "United Kingdom");
+    await user.click(screen.getByRole("button", { name: "Search" }));
+    await user.click(screen.getByRole("option", { name: /United Kingdom GB \+44/i }));
+    await user.type(screen.getByLabelText("Phone number"), "700abc0000000");
     await user.click(screen.getByRole("button", { name: "Book a Call" }));
 
     expect(screen.getByRole("button", { name: "Request Sent" })).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith(
       "http://localhost:4000/api/contact",
       expect.objectContaining({
-        method: "POST"
+        method: "POST",
+        body: JSON.stringify({
+          businessEmail: "ada@example.com",
+          country: "United Kingdom",
+          countryCode: "+44",
+          phoneNumber: "7000000000"
+        })
       })
     );
   });
