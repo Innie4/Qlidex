@@ -33,14 +33,6 @@ const faqs = [
   }
 ];
 
-const navTargets = [
-  { label: "Home", href: "#top", x: 575, y: 49, w: 76, h: 33 },
-  { label: "About", href: "#about", x: 680, y: 49, w: 80, h: 33 },
-  { label: "Services", href: "#services", x: 791, y: 49, w: 94, h: 33 },
-  { label: "FAQ", href: "#faq", x: 918, y: 49, w: 64, h: 33 },
-  { label: "Contact Us", href: "#contact", x: 1254, y: 34, w: 166, h: 48 }
-];
-
 const trustCards = [
   { title: "Forex & Prop", subtitle: "Trading", icon: "FT" },
   { title: "Crypto &", subtitle: "Web3", icon: "CW" },
@@ -104,15 +96,21 @@ export function LandingPage() {
         />
 
         <div className="prototype-layer" aria-label="Interactive prototype layer">
-          {navTargets.map((target) => (
-            <a
-              key={target.label}
-              className="hotspot nav-hotspot"
-              href={target.href}
-              aria-label={target.label}
-              style={artboardStyle(target.x, target.y, target.w, target.h)}
-            />
-          ))}
+          <div className="art-mask header-mask" style={artboardStyle(0, 0, 1512, 150)} aria-hidden="true" />
+          <header className="site-header" aria-label="Primary navigation">
+            <a className="site-logo" href="#top" aria-label="Qlidex home">
+              Qlidex
+            </a>
+            <nav className="site-nav" aria-label="Main">
+              <a href="#top">Home</a>
+              <a href="#about">About</a>
+              <a href="#services">Services</a>
+              <a href="#faq">FAQs</a>
+            </nav>
+            <a className="site-cta" href="#contact">
+              Contact Us
+            </a>
+          </header>
 
           <a
             className="hotspot button-hotspot"
